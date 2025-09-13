@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Declaração</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .container {
+      position: relative;
+      width: 350px;
+      perspective: 1500px;
+    }
+
+    .carta {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      background: #fffaf0;
+      border-radius: 12px;
+      box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      border: 2px solid #f8cdda;
+      cursor: pointer;
+    }
+
+    /* CAPA / ENVELOPE */
+    .envelope-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom, #fff8f0, #f2e1d8); /* tom de papel */
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      box-shadow: inset 0 -4px 8px rgba(0,0,0,0.1), 0 4px 12px rgba(0,0,0,0.2);
+      transform-origin: top;
+      transform: rotateX(0deg);
+      transition: transform 1s ease-in-out;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-bottom: 1px solid #e0cfc1;
+    }
+
+    .carta.abrir .envelope-top {
+      transform: rotateX(-180deg);
+    }
+
+    .envelope-top::after {
+      content: "";
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(to top, rgba(0,0,0,0.05), transparent);
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    .heart {
+      width: 35px;
+      height: 35px;
+      background-color: #e91e63;
+      clip-path: polygon(
+        50% 0%, 61% 12%, 75% 15%, 78% 28%, 
+        78% 50%, 50% 80%, 22% 50%, 22% 28%, 
+        25% 15%, 39% 12%
+      );
+      transition: transform 0.4s ease;
+    }
+
+    .pulse {
+      animation: pulse 0.6s ease forwards;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    .carta-conteudo {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      z-index: 1;
+      font-family: 'Georgia', serif;
+    }
+
+    h2 {
+      font-family: 'Cursive', sans-serif;
+      color: #e91e63;
+      text-align: center;
+    }
+
+    p {
+      font-size: 1.05em;
+      color: #333;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    /* Corações flutuando no fundo da carta */
+    .carta::before {
+      content: "❤ ❤ ❤ ❤ ❤";
+      position: absolute;
+      top: 20%;
+      left: 5%;
+      font-size: 1.5em;
+      color: rgba(233, 30, 99, 0.1);
+      animation: float 6s infinite alternate ease-in-out;
+    }
+
+    @keyframes float {
+      from { transform: translateY(0); }
+      to { transform: translateY(-20px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="carta" id="carta">
+      <div class="envelope-top" id="abrirCarta">
+        <div class="heart" id="heart"></div>
+      </div>
+      <div class="carta-conteudo" id="conteudo">
+        <h2>Para você</h2>
+        <p>
+          Do jeitinho mais simples de falar sem enrolação: eu amo você. 
+          Cada momento, cada olhar à cada piscada melhoram meu dia. 
+          Tudo que envolve você é muito bom, principalmente quando são coisas que você gosta.
+          Os batimentos cardíacos aumentam a cada momento que você chega perto de mim.
+          🌸💌
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Música Lo-Fi -->
+  <audio id="musica" loop>
+    <source src="lofi-música.mp3">
+    Seu navegador não suporta áudio.
+  </audio>
+
+  <script>
+    const carta = document.getElementById("carta");
+    const abrirCarta = document.getElementById("abrirCarta");
+    const conteudo = document.getElementById("conteudo");
+    const heart = document.getElementById("heart");
+    const musica = document.getElementById("musica");
+
+    // Abrir carta
+    abrirCarta.addEventListener("click", () => {
+      heart.classList.add("pulse");
+      setTimeout(() => {
+        carta.classList.toggle("abrir");
+        heart.classList.remove("pulse");
+        musica.play();
+      }, 600);
+    });
+
+    // Duplo clique para reiniciar
+    carta.addEventListener("dblclick", () => {
+      carta.classList.remove("abrir");
+      musica.pause();
+      musica.currentTime = 0;
+    });
+
+    // Clique longo para editar texto
+    let pressTimer;
+    conteudo.addEventListener("mousedown", () => {
+      pressTimer = setTimeout(() => {
+        const novoTexto = prompt("Escreva sua mensagem:");
+        if (novoTexto) {
+          conteudo.querySelector("p").innerText = novoTexto;
+        }
+      }, 800); // 0,8s de clique longo
+    });
+    conteudo.addEventListener("mouseup", () => clearTimeout(pressTimer));
+    conteudo.addEventListener("mouseleave", () => clearTimeout(pressTimer));
+  </script>
+</body>
+</html>
